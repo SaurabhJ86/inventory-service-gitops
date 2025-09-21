@@ -1,0 +1,36 @@
+# Headless Service for StatefulSet (required)
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-headless
+  namespace: default
+  labels:
+    app: postgres
+    component: database
+spec:
+  clusterIP: None  # Headless service
+  selector:
+    app: postgres
+  ports:
+    - port: 5432
+      targetPort: 5432
+      name: postgres
+
+---
+# Regular Service for application access
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: default
+  labels:
+    app: postgres
+    component: database
+spec:
+  type: ClusterIP
+  selector:
+    app: postgres
+  ports:
+    - port: 5432
+      targetPort: 5432
+      name: postgres
