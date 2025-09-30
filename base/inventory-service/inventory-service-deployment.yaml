@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: inventory-service
-          image: ""
+          image: inventory-service:test
           imagePullPolicy: Never
           ports:
             - containerPort: 8088
