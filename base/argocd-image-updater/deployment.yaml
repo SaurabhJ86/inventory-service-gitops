@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: argocd-image-updater
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: argocd-image-updater
+    app.kubernetes.io/part-of: argocd
+    app.kubernetes.io/component: image-updater
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: argocd-image-updater
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: argocd-image-updater
+    spec:
+      serviceAccountName: argocd-image-updater
+      containers:
+        - name: argocd-image-updater
+          image: quay.io/argoprojlabs/argocd-image-updater:v0.12.2
+          imagePullPolicy: IfNotPresent
+          command:
+            - /usr/local/bin/argocd-image-updater
+            - run
+          args:
+            - --interval=2m
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+            - containerPort: 8081
+              name: metrics
+              protocol: TCP
+          env:
+            - name: APPLICATIONS_API
+              value: "argocd"
+            - name: ARGOCD_GRPC_WEB
+              value: "true"
+            - name: ARGOCD_SERVER
+              value: "argocd-server.argocd.svc.cluster.local"
+            - name: ARGOCD_INSECURE
+              value: "true"
+            - name: ARGOCD_PLAINTEXT
+              value: "false"
+            - name: IMAGE_UPDATER_LOGLEVEL
+              value: "info"
+            - name: KUBE_EVENTS
+              value: "false"
+            - name: ARGOCD_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: argocd-image-updater-secret
+                  key: argocd.token
+          volumeMounts:
+            - name: config
+              mountPath: /app/config
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
+              memory: "128Mi"
+              cpu: "100m"
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+      volumes:
+        - name: config
+          configMap:
+            name: argocd-image-updater-config
+            optional: false
+        - name: tmp
+          emptyDir: {}
