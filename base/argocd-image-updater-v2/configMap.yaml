@@ -18,5 +18,5 @@ data:
         prefix: 394570007745.dkr.ecr.ap-south-1.amazonaws.com
         ping: yes
         insecure: no
-        credentials: secrets:argocd/ecr-credentials#creds
+        credentials: secret:argocd/ecr-credentials#creds
         credsexpire: 10h
