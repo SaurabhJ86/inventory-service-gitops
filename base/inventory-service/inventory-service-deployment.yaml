@@ -21,7 +21,7 @@ spec:
       containers:
         - name: inventory-service
           image: 394570007745.dkr.ecr.ap-south-1.amazonaws.com/inventory-service:1.2.4
-          imagePullPolicy: Never
+          imagePullPolicy: Always
           ports:
             - containerPort: 8088
           resources:
