@@ -1,45 +1,45 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-
 resources:
-  - ../../base/inventory-service
-  - ../../base/postgres
-
+- ../../base/inventory-service
+- ../../base/postgres
 namePrefix: gitops-
-
 patches:
-  - target:
-      kind: Deployment
-      name: inventory-service
-    patch: |-
-      - op: replace
-        path: /spec/replicas
-        value: 1
-  - target:
-      kind: Service
-      name: inventory-service
-    patch: |-
-      - op: replace
-        path: /spec/ports/0/nodePort
-        value: 30001
-  - target:
-      kind: ConfigMap
-      name: inventory-service-config
-    patch: |-
-      - op: replace
-        path: /data/SPRING_DATASOURCE_URL
-        value: "jdbc:postgresql://gitops-postgres:5432/cart_db"
-  - target:
-      kind: StatefulSet
-      name: postgres
-    patch: |-
-      - op: add
-        path: /spec/template/metadata/labels/instance
-        value: gitops
-  - target:
-      kind: Service
-      name: postgres
-    patch: |-
-      - op: add
-        path: /spec/selector/instance
-        value: gitops
+- target:
+    kind: Deployment
+    name: inventory-service
+  patch: |-
+    - op: replace
+      path: /spec/replicas
+      value: 1
+- target:
+    kind: Service
+    name: inventory-service
+  patch: |-
+    - op: replace
+      path: /spec/ports/0/nodePort
+      value: 30001
+- target:
+    kind: ConfigMap
+    name: inventory-service-config
+  patch: |-
+    - op: replace
+      path: /data/SPRING_DATASOURCE_URL
+      value: "jdbc:postgresql://gitops-postgres:5432/cart_db"
+- target:
+    kind: StatefulSet
+    name: postgres
+  patch: |-
+    - op: add
+      path: /spec/template/metadata/labels/instance
+      value: gitops
+- target:
+    kind: Service
+    name: postgres
+  patch: |-
+    - op: add
+      path: /spec/selector/instance
+      value: gitops
+images:
+- name: 394570007745.dkr.ecr.ap-south-1.amazonaws.com/inventory-service
+  newTag: 1.2.6
